@@ -1,8 +1,13 @@
+#include "terminal.h"
 #include <stdint.h>
 
 /* Protótipo da função kernel_main */
 void kernel_main(void);
-void print_string(const char *str);
+
+// Função principal do kernel
+void kernel_main() {
+    terminal_run();  // Inicia o terminal
+}
 
 /* Cabeçalho Multiboot */
 #define MULTIBOOT_HEADER_MAGIC   0x1BADB002
