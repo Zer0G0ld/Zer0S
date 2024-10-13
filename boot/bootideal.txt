@@ -1,0 +1,6 @@
+Um "bootloader de verdade" precisa realizar tarefas fundamentais, como:
+
+1. Configurar o modo de operação do processador: Um bootloader moderno geralmente muda para o modo protegido (protected mode) ou modo longo (long mode para 64 bits), saindo do modo real de 16 bits.
+2. Carregar o kernel: O bootloader precisa carregar o kernel do sistema operacional na memória.
+3. Configurar a memória: Ele deve configurar adequadamente o uso da memória RAM e garantir que o kernel seja carregado em um local apropriado.
+4. Transferir o controle para o kernel: Após carregar o kernel, o bootloader deve transferir o controle para ele para iniciar o sistema operacional.
