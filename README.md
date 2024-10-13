@@ -22,11 +22,11 @@ Zer0S/
 │   └── grub.cfg        # Arquivo de configuração do GRUB
 ├── README.md           # Documentação do projeto
 ├── Makefile            # Arquivo Makefile para automação do processo
+├── linker.ld           # Arquivo de script do linker (novo)
 └── iso/                # Estrutura de diretórios para gerar a ISO
     └── boot/           # Diretórios para o GRUB e kernel dentro da imagem ISO
         └── grub/
             └── grub.cfg # Arquivo de configuração do GRUB na imagem ISO
-
 ```
 
 ## Requisitos
@@ -128,10 +128,3 @@ Para testar o terminal, você pode compilar o kernel com o código do shell e em
 ## Licença
 
 Este projeto está em fase experimental e não possui uma licença formal no momento.
-```
-
-### O que foi atualizado:
-- **Estrutura do Projeto**: Incluí um diretório `terminal/` para o código do terminal (shell).
-- **Lógica do Projeto**: A seção foi atualizada para incluir o terminal que foi desenvolvido e as funcionalidades associadas.
-- **Compilação do Projeto**: Detalhei a parte de como compilar e testar o terminal interativo.
->>>>>>> e57ecc2 (Versão Inicial)
