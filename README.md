@@ -7,10 +7,19 @@ Este projeto é uma tentativa de criar um sistema operacional básico do zero. E
 ```
 Zer0S/
 ├── boot/               # Código do bootloader em Assembly
-│   └── boot.asm
-├── src/                # Código-fonte do kernel em C
-│   └── kernel.c
-├── include/            # Arquivos de cabeçalho, se necessário
+│   └── boot.asm        # Código do bootloader
+├── src/                # Código-fonte do kernel e outros módulos em C
+│   ├── kernel.c        # Código principal do kernel
+│   ├── gdt.c           # Inicialização da GDT
+│   ├── gdt.h           # Cabeçalho da GDT
+│   ├── isr.c           # Tratadores de interrupção
+│   ├── isr.h           # Cabeçalho dos tratadores de interrupção
+│   ├── idt.c           # Inicialização da IDT (interrupção)
+│   └── idt.h           # Cabeçalho da IDT
+├── include/            # Arquivos de cabeçalho
+│   ├── gdt.h           # Arquivo de cabeçalho da GDT
+│   ├── isr.h           # Arquivo de cabeçalho dos tratadores de interrupção
+│   └── idt.h           # Arquivo de cabeçalho da IDT
 ├── build/              # Diretório onde os binários serão gerados
 │   ├── boot.bin        # Arquivo do bootloader compilado
 │   ├── kernel.o        # Arquivo objeto do kernel
@@ -18,15 +27,18 @@ Zer0S/
 │   ├── myos.iso        # Imagem ISO gerada
 │   └── boot.img        # Imagem IMG (se necessário)
 ├── terminal/           # Código-fonte do terminal (shell)
+│   ├── shell.c         # Código do shell interativo
+│   ├── shell.h         # Cabeçalho do shell
 ├── grub/               # Arquivos relacionados ao GRUB
 │   └── grub.cfg        # Arquivo de configuração do GRUB
 ├── README.md           # Documentação do projeto
 ├── Makefile            # Arquivo Makefile para automação do processo
-├── linker.ld           # Arquivo de script do linker (novo)
+├── linker.ld           # Arquivo de script do linker
 └── iso/                # Estrutura de diretórios para gerar a ISO
     └── boot/           # Diretórios para o GRUB e kernel dentro da imagem ISO
         └── grub/
             └── grub.cfg # Arquivo de configuração do GRUB na imagem ISO
+
 ```
 
 ## Requisitos
