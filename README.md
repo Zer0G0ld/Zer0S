@@ -2,6 +2,9 @@
 
 Este projeto é uma tentativa de criar um sistema operacional básico do zero. Ele envolve o desenvolvimento de um bootloader simples em Assembly e um kernel em C, utilizando o NASM para compilar o código Assembly e o GCC para o código C. O objetivo é construir um sistema operacional básico com funcionalidades iniciais, como um terminal simples para interações com o usuário.
 
+Para esse projeto vou usar um outro repositório que estou desenvolvendo o [ShellZer0](https://github.com/Zer0G0ld/ShellZer0) para ser um tipo de "Shell" deste SO. 
+> kkkkkkk Vai ser otimo! kkkkkkkkk
+
 ## Estrutura do Projeto
 
 ```
