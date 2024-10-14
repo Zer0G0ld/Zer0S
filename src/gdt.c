@@ -1,7 +1,11 @@
+#include <stdint.h>
 #include "gdt.h"
+#include <stddef.h>  // Para uintptr_t
 
 gdt_entry_t gdt_entries[5];  // 5 entradas, uma para cada segmento (segundo o padrão x86)
 gdt_ptr_t gdt_ptr;           // Ponteiro para a GDT
+
+void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
 // Função que inicializa a GDT
 void gdt_init(void) {
