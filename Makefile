@@ -19,15 +19,17 @@ KERNEL_SRC = $(SRC_DIR)/kernel.c
 BOOT_SRC = boot/boot.asm
 
 # Flags de compilação
-CFLAGS = -ffreestanding -mno-red-zone -fno-builtin -Wall -Wextra -O2 -Iinclude
+CFLAGS = -ffreestanding -m32 -mno-red-zone -fno-builtin -Wall -Wextra -O2 -Iinclude -Isrc -Iterminal
 ASFLAGS = -f elf
 
 # Adicionar os novos arquivos de origem
 GDT_SRC = $(SRC_DIR)/gdt.c
+IDT_SRC = $(SRC_DIR)/idt.c
+ISR_SRC = $(SRC_DIR)/isr.c
 INTERRUPTS_SRC = $(SRC_DIR)/interrupts.c
 
-# Adicionar as novas dependências
-KERNEL_OBJS = $(OBJ_DIR)/kernel.o $(OBJ_DIR)/gdt.o $(OBJ_DIR)/interrupts.o $(GDT_ASM_OBJ)
+# Adicionar a dependência do shell.o e outros objetos
+KERNEL_OBJS = $(OBJ_DIR)/kernel.o $(OBJ_DIR)/gdt.o $(OBJ_DIR)/interrupts.o $(GDT_ASM_OBJ) $(OBJ_DIR)/shell.o $(OBJ_DIR)/keyboard.o $(OBJ_DIR)/utils.o $(OBJ_DIR)/idt.o $(OBJ_DIR)/isr.o
 
 # Regras para compilar o código
 all: build $(ISO_NAME)
@@ -56,6 +58,14 @@ $(OBJ_DIR)/interrupts.o: $(INTERRUPTS_SRC)
 	@echo "Compilando o arquivo de interrupções..."
 	$(CC) $(CFLAGS) -c $(INTERRUPTS_SRC) -o $(OBJ_DIR)/interrupts.o
 
+$(OBJ_DIR)/idt.o: $(IDT_SRC)
+	@echo "Compilando o IDT..."
+	$(CC) $(CFLAGS) -c $(IDT_SRC) -o $(OBJ_DIR)/idt.o
+
+$(OBJ_DIR)/isr.o: $(ISR_SRC)
+	@echo "Compilando o ISR..."
+	$(CC) $(CFLAGS) -c $(ISR_SRC) -o $(OBJ_DIR)/isr.o
+
 $(BOOT_BIN): $(BOOT_SRC)
 	@echo "Compilando o Bootloader..."
 	$(AS) $(BOOT_SRC) -o $(BOOT_BIN)
@@ -64,9 +74,22 @@ $(GDT_ASM_OBJ): $(GDT_ASM_SRC)
 	@echo "Compilando o GDT Assembly..."
 	nasm -f elf32 $(GDT_ASM_SRC) -o $(GDT_ASM_OBJ)
 
+$(OBJ_DIR)/keyboard.o: src/keyboard.c include/keyboard.h
+	@echo "Compilando o Keyboard..."
+	$(CC) $(CFLAGS) -c src/keyboard.c -o $(OBJ_DIR)/keyboard.o
+
+# Caminho correto para utils
+$(OBJ_DIR)/utils.o: terminal/utils.c include/utils.h
+	@echo "Compilando utils..."
+	$(CC) $(CFLAGS) -c terminal/utils.c -o $(OBJ_DIR)/utils.o
+
+$(OBJ_DIR)/shell.o: terminal/shell.c include/shell.h
+	@echo "Compilando o Shell..."
+	$(CC) $(CFLAGS) -c terminal/shell.c -o $(OBJ_DIR)/shell.o
+
 clean:
 	@echo "Limpando os arquivos de compilação..."
-	rm -rf $(OBJ_DIR) $(BIN_DIR) $(ISO_DIR)
+	rm -rf $(OBJ_DIR) $(BIN_DIR) $(ISO_DIR) $(KERNEL_BIN) $(BOOT_BIN)
 
 run: $(ISO_NAME)
 	@echo "Iniciando o sistema no QEMU..."

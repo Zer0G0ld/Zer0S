@@ -1,4 +1,7 @@
-#include "terminal.h"
+#include "shell.h"
+#include "ports.h"
+#include "keyboard.h"  // Inclui o cabeçalho do teclado
+#include "utils.h"
 #include <stdint.h>
 
 // Variáveis globais de estado do terminal
@@ -76,14 +79,14 @@ void terminal_welcome() {
 
 // Função para lidar com a entrada do usuário
 void terminal_handle_input(char* input) {
-    if (strcmp(input, "help") == 0) {
+    if (strcmp_impl(input, "help") == 0) {
         terminal_write("Comandos disponíveis:\n");
         terminal_write("clear - Limpa o terminal\n");
         terminal_write("help  - Exibe essa ajuda\n");
         terminal_write("exit  - Sai do terminal\n");
-    } else if (strcmp(input, "clear") == 0) {
+    } else if (strcmp_impl(input, "clear") == 0) {
         terminal_clear();
-    } else if (strcmp(input, "exit") == 0) {
+    } else if (strcmp_impl(input, "exit") == 0) {
         terminal_write("Saindo...\n");
         // Função para desligar o sistema ou retornar ao bootloader
         // shutdown();
@@ -103,8 +106,7 @@ void terminal_run() {
 
     while (1) {
         // Captura a entrada do usuário (pode ser implementado usando interrupções ou polled I/O)
-        char ch = teclado_get_char();  // Função de leitura do teclado (precisa ser implementada)
-
+        char ch = teclado_get_char();  // Função de leitura do teclado 
         if (ch == '\n') {
             input[i] = '\0';  // Finaliza a string
             terminal_write("\n");

@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "gdt.h"
 #include "interrupts.h"
+#include "shell.h"
+#include "screen.h"  // Para a exibição de texto no terminal
 
 /* Protótipo da função kernel_main */
 void kernel_main(void);
@@ -40,6 +42,14 @@ multiboot_header_t __attribute__((section(".multiboot"))) multiboot_header = {
     .entry_addr = 0 // Inicialize como 0
 };
 
+void shell_main() {
+    print_string("Welcome to ShellZer0!\n");
+    // Aqui você pode implementar o loop principal do shell
+    while (1) {
+        // Aguardar comandos e executá-los
+    }
+}
+
 /* Função para limpar a tela com cor de fundo e texto configuráveis */
 void clear_screen(uint8_t bg_color, uint8_t fg_color) {
     uintptr_t vidptr = 0xb8000; // Endereço de vídeo da tela
@@ -47,7 +57,7 @@ void clear_screen(uint8_t bg_color, uint8_t fg_color) {
 
     // Limpa a tela
     for (unsigned int i = 0; i < 80 * 25; ++i) {
-        *((uint16_t*)vidptr + i) = (uint16_t)color << 8; // Define o caractere e cor
+        *((uint16_t*)vidptr + i) = (uint16_t)(color | ' '); // Caractere ' ' com a cor definida
     }
 }
 
@@ -79,6 +89,9 @@ void kernel_main(void) {
     
     clear_screen(0x00, 0x0F);       // Limpa a tela com fundo preto e texto branco
     print_string(str);    // Exibe a string
+
+    // Inicia o terminal ShellZer0
+    shell_main(); // Chama a função do terminal para interação com o usuário
 
     // Fica preso no laço, para que o kernel não termine
     while (1) { }
