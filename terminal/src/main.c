@@ -6,6 +6,7 @@
 #include <readline/history.h>
 #include <signal.h>  
 #include "parser.h"  
+#include "utils.h"
 
 // Declaração do protótipo de parse_input
 char **parse_input(char *input);
@@ -100,7 +101,7 @@ int main() {
             continue;     // Ignora entradas vazias
         }
 
-        if (strcmp(args[0], "exit") == 0) {
+        if (strcmp_impl(args[0], "exit") == 0) {
             free(input);
             break;
         }

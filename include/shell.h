@@ -12,4 +12,6 @@ void terminal_handle_input(char* input);
 // Função placeholder para captura de entrada de teclado
 char teclado_get_char();
 
+void shell_main(void);
+
 #endif /* TERMINAL_H */

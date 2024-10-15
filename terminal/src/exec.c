@@ -6,6 +6,7 @@
 #include <fcntl.h> // Para manipulação de arquivos
 #include <sys/stat.h>
 #include <signal.h>
+#include "utils.h"
 
 // Função para obter informações sobre o arquivo
 void file_info(char *filename) {
@@ -28,9 +29,9 @@ void execute_with_redirection(char **args) {
 
     // Detecta redirecionamento de entrada/saída
     for (int i = 0; args[i] != NULL; i++) {
-        if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
+        if (strcmp_impl(args[i], ">") == 0 && args[i+1] != NULL) {
             output_redirect = i;
-        } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
+        } else if (strcmp_impl(args[i], "<") == 0 && args[i+1] != NULL) {
             input_redirect = i;
         }
     }
@@ -133,7 +134,7 @@ void execute_command(char **args) {
 
     // Verifica se existe um pipe no comando
     for (int i = 0; args[i] != NULL; i++) {
-        if (strcmp(args[i], "|") == 0) {
+        if (strcmp_impl(args[i], "|") == 0) {
             has_pipe = i;
             break;
         }

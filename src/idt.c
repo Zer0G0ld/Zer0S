@@ -1,8 +1,15 @@
 #include "idt.h"
+#include "isr.h"
 
 // Definindo a IDT e o ponteiro da IDT
 idt_entry_t idt[IDT_ENTRIES];
 idt_ptr_t idt_ptr;
+
+void idt_flush(idt_ptr_t* idt_ptr) {
+    __asm__ volatile(
+        "lidt (%0)" : : "r"(idt_ptr) : "memory"
+    );
+}
 
 // Função que inicializa a IDT
 void idt_init() {
@@ -19,11 +26,11 @@ void idt_init() {
         idt[i].flags = 0;
     }
 
-    // Agora, as ISRs precisam ser configuradas. Exemplo:
-    // set_idt_gate(0, (uint32_t)isr_handler);  // exemplo de uso para registrar uma ISR
+    // Configurar as entradas de interrupção (Exemplo de configuração de ISR para 0x20)
+    set_idt_gate(0x20, (uint32_t)isr0, 0x08, 0x8E);  // Exemplo de uso com a ISR de divisão por zero
 
     // Carregar a IDT
-    idt_flush((uint32_t)&idt_ptr);
+    idt_flush(&idt_ptr);
 }
 
 // Função para definir um "gate" da IDT

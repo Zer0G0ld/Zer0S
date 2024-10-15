@@ -1,6 +1,3 @@
-Aqui está o seu `README.md` com as sugestões aplicadas:
-
-```markdown
 # Zer0S - Sistema Operacional Personalizado
 
 Este projeto é uma tentativa de criar um sistema operacional básico do zero. Ele envolve o desenvolvimento de um bootloader simples em Assembly e um kernel em C, utilizando o NASM para compilar o código Assembly e o GCC para o código C. O objetivo é construir um sistema operacional básico com funcionalidades iniciais, como um terminal simples para interações com o usuário.
@@ -18,15 +15,14 @@ Zer0S/
 ├── src/                # Código-fonte do kernel e outros módulos em C
 │   ├── kernel.c        # Código principal do kernel
 │   ├── gdt.c           # Inicialização da GDT
-│   ├── gdt.h           # Cabeçalho da GDT
 │   ├── isr.c           # Tratadores de interrupção
-│   ├── isr.h           # Cabeçalho dos tratadores de interrupção
 │   ├── idt.c           # Inicialização da IDT (interrupção)
-│   └── idt.h           # Cabeçalho da IDT
 ├── include/            # Arquivos de cabeçalho
 │   ├── gdt.h           # Arquivo de cabeçalho da GDT
 │   ├── isr.h           # Arquivo de cabeçalho dos tratadores de interrupção
-│   └── idt.h           # Arquivo de cabeçalho da IDT
+│   ├── idt.h           # Arquivo de cabeçalho da IDT
+│   ├── gdt.h           # Cabeçalho para GDT
+│   └── kernel.h        # Cabeçalho do kernel
 ├── build/              # Diretório onde os binários serão gerados
 │   ├── boot.bin        # Arquivo do bootloader compilado
 │   ├── kernel.o        # Arquivo objeto do kernel
@@ -45,6 +41,7 @@ Zer0S/
     └── boot/           # Diretórios para o GRUB e kernel dentro da imagem ISO
         └── grub/
             └── grub.cfg # Arquivo de configuração do GRUB na imagem ISO
+
 ```
 
 ## Requisitos
@@ -226,7 +223,7 @@ Contribuições são bem-vindas! Se você gostaria de contribuir para o projeto,
 ## Licença
 
 Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais informações.
-```
+
 
 ### Principais Modificações:
 - Uniformização dos títulos e formatação.
@@ -235,4 +232,3 @@ Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mai
 - Descrição detalhada do Makefile e seus comandos.
 - Links e referências extras para facilitar a navegação e entendimento.
 
-Essas mudanças tornam o README mais organizado e fácil de seguir para novos desenvolvedores ou colaboradores.
