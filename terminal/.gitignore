@@ -1,0 +1,69 @@
+# Diretórios de build e artefatos gerados
+build/
+dist/
+downloads/
+
+# Arquivos de configuração de ambiente e dependências
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Arquivos temporários e de cache
+*.swp
+*.bak
+*.tmp
+*.log
+
+# Arquivos de configuração de IDE e editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Arquivos de configuração do GitHub
+.github/
+
+# Arquivos binários e objetos gerados pelo compilador
+*.o
+*.a
+*.so
+*.exe
+
+# Arquivos de compilação e depuração
+*.dSYM/
+*.stackdump
+
+# Arquivos do sistema operacional (por exemplo, arquivos criados pelo macOS ou Windows)
+.DS_Store
+Thumbs.db
+
+# Arquivos do Python (caso existam)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos do C (dependendo do seu uso)
+*.out
+*.elf
+*.bin
+
+# Diretórios de testes e relatórios de cobertura
+tests/coverage/
+*.cover
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Arquivos do PyCharm
+.idea/
+
+# Arquivos específicos de depuração do C
+*.gdb
+*.dSYM
+
+# Arquivos temporários de edição de imagens
+img/*.png~
