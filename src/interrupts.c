@@ -3,15 +3,27 @@
 
 extern void idt_flush(uint32_t idt_ptr);
 
-void set_idt_gate(int num, uint32_t base, uint16_t sel, uint8_t flags) {
-    idt[num].base_low = base & 0xFFFF;
-    idt[num].base_high = (base >> 16) & 0xFFFF;
-    idt[num].sel = sel;
-    idt[num].always0 = 0;
-    idt[num].flags = flags;
-}
+// Declare a estrutura para a IDT corretamente
+extern idt_entry_t idt[IDT_ENTRIES];  // Usando o nome correto
 
-void idt_flush(uint32_t idt_ptr) {
-    // Função para carregar a IDT
-    __asm__ __volatile__ ("lidt (%0)" : : "r"(idt_ptr));
+void interrupts_init() {
+    // Inicializa a IDT
+    uintptr_t idt_ptr = (uintptr_t)&idt;  // Use uintptr_t para armazenar um ponteiro
+
+    // Limpa a IDT
+    for (int i = 0; i < IDT_ENTRIES; i++) {
+        idt[i].base_low = 0;
+        idt[i].base_high = 0;
+        idt[i].sel = 0;
+        idt[i].always0 = 0;
+        idt[i].flags = 0;
+    }
+
+    // Agora você pode definir as entradas da IDT usando set_idt_gate()
+
+    // Exemplo de configuração para interrupção de hardware
+    set_idt_gate(0x20, (uint32_t)isr0, 0x08, 0x8E);  // Exemplo para interrupção 32 (timer)
+
+    // Finalmente, carregue a IDT
+    idt_flush((uint32_t)idt_ptr);
 }

@@ -23,12 +23,16 @@ void isr_handler(registers_t regs) {
 
 // Função que instala as ISRs na IDT
 void isr_install() {
-    // Para cada ISR, registramos a função apropriada na IDT
-    // Usaremos uma função que você já deve ter em `interrupts.c`, como `set_idt_gate`
-    
-    // Exemplo:
-    set_idt_gate(0, (uint32_t)isr_handler); // Registrar uma ISR para o número 0 (divisão por zero)
-    set_idt_gate(13, (uint32_t)isr_handler); // Registrar a ISR para a exceção de proteção geral
-    set_idt_gate(14, (uint32_t)isr_handler); // Registrar a ISR para a falha de página
-    // Você pode adicionar mais interrupções conforme necessário
+    // Exemplo de como instalar as ISRs
+    set_idt_gate(0, (uint32_t)isr0, 0x08, 0x8E);  // Registrar uma ISR para o número 0 (divisão por zero)
+    set_idt_gate(13, (uint32_t)isr_handler, 0x08, 0x8E); // Registrar a ISR para a exceção de proteção geral
+    set_idt_gate(14, (uint32_t)isr_handler, 0x08, 0x8E); // Registrar a ISR para a falha de página
+    // Adicione mais interrupções conforme necessário
+}
+
+// Definir a função isr0, que será chamada para a interrupção de divisão por zero
+void isr0() {
+    // Aqui você pode adicionar código para lidar com a interrupção de divisão por zero
+    // Por exemplo, exibir uma mensagem de erro ou abortar o programa
+    // Esta função será chamada quando a interrupção 0 (divisão por zero) ocorrer
 }

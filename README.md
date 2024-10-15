@@ -3,7 +3,7 @@
 Este projeto é uma tentativa de criar um sistema operacional básico do zero. Ele envolve o desenvolvimento de um bootloader simples em Assembly e um kernel em C, utilizando o NASM para compilar o código Assembly e o GCC para o código C. O objetivo é construir um sistema operacional básico com funcionalidades iniciais, como um terminal simples para interações com o usuário.
 
 Para esse projeto vou usar um outro repositório que estou desenvolvendo o [ShellZer0](https://github.com/Zer0G0ld/ShellZer0) para ser um tipo de "Shell" deste SO. 
-> kkkkkkk Vai ser otimo! kkkkkkkkk
+> kkkkkkk Vai ser ótimo! kkkkkkkkk
 
 ## Estrutura do Projeto
 
@@ -41,7 +41,6 @@ Zer0S/
     └── boot/           # Diretórios para o GRUB e kernel dentro da imagem ISO
         └── grub/
             └── grub.cfg # Arquivo de configuração do GRUB na imagem ISO
-
 ```
 
 ## Requisitos
@@ -84,6 +83,7 @@ O projeto agora inclui um terminal (ou shell), que permite ao usuário interagir
 
 - O terminal é escrito em C e funciona dentro do kernel.
 - O shell permite comandos simples como `hello` para exibir uma saudação e `shutdown` para encerrar o sistema.
+- O terminal será integrado ao Zer0S através do submódulo [ShellZer0](https://github.com/Zer0G0ld/ShellZer0).
 
 ## Compilando o Projeto
 
@@ -124,60 +124,64 @@ qemu-system-x86_64 -drive format=raw,file=build/boot.bin
 Este comando vai iniciar a emulação e exibir a mensagem do bootloader.
 
 ## Compilando e Executando o Projeto com Makefile
+
 Para facilitar o processo de compilação, linkagem e execução, foi adicionado um `Makefile` ao projeto. Com ele, você pode compilar o bootloader, o kernel e gerar a imagem ISO para rodar o sistema operacional de maneira automatizada.
 
 ### Comandos Disponíveis no Makefile
-- **Compilar o Projeto:**
-Este comando irá compilar tanto o bootloader quanto o kernel, além de gerar a imagem ISO pronta para ser executada.
 
-```bash
-make
-```
+- **Compilar o Projeto**: Este comando irá compilar tanto o bootloader quanto o kernel, além de gerar a imagem ISO pronta para ser executada.
+  
+  ```bash
+  make
+  ```
 
-- **Limpar o Diretório Build:**
-Este comando remove todos os arquivos gerados durante a compilação (binários, objetos, e a ISO), permitindo uma recompilação limpa.
+- **Limpar o Diretório Build**: Este comando remove todos os arquivos gerados durante a compilação (binários, objetos, e a ISO), permitindo uma recompilação limpa.
 
-```bash
-make clean
-```
+  ```bash
+  make clean
+  ```
 
-- **Executar o Sistema Operacional no QEMU:**
-Após a compilação, você pode usar este comando para rodar a imagem ISO diretamente no emulador QEMU e testar o sistema operacional.
+- **Executar o Sistema Operacional no QEMU**: Após a compilação, você pode usar este comando para rodar a imagem ISO diretamente no emulador QEMU e testar o sistema operacional.
 
-```bash
-make run
-```
+  ```bash
+  make run
+  ```
 
 ### Estrutura Interna do Makefile
+
 - O **Makefile** foi configurado para automatizar os seguintes passos:
-1. Compilação do bootloader (código Assembly).
-2. Compilação do kernel (código C).
-3. Linkagem dos arquivos compilados (bootloader e kernel) para gerar um binário combinado.
-4. Criação da imagem ISO utilizando os arquivos necessários (bootloader, kernel e GRUB).
-5. Emulação do sistema operacional no QEMU.
+  1. Compilação do bootloader (código Assembly).
+  2. Compilação do kernel (código C).
+  3. Linkagem dos arquivos compilados (bootloader e kernel) para gerar um binário combinado.
+  4. Criação da imagem ISO utilizando os arquivos necessários (bootloader, kernel e GRUB).
+  5. Emulação do sistema operacional no QEMU.
 
 ### Exemplo de Uso
+
 1. Para compilar o projeto:
 
-```bash
-make
-```
+  ```bash
+  make
+  ```
+
 Isso irá compilar o bootloader e o kernel e gerar a ISO (`zer0.iso`) na pasta `build/`.
 
 2. Para rodar o sistema no QEMU após a compilação:
 
-```bash
-make run
-```
+  ```bash
+  make run
+  ```
+
 3. Para limpar os arquivos gerados e recompilar do zero:
 
-```bash
-make clean
-```
+  ```bash
+  make clean
+  ```
 
 ### Futuras Melhorias no Makefile
-- **Teste Automatizado:** No futuro, podemos adicionar testes automatizados ao Makefile para verificar o funcionamento de novos componentes à medida que o projeto evolui.
-- **Suporte a Várias Arquiteturas:** Expandir o Makefile para compilar o sistema operacional para outras arquiteturas, além do x86.
+
+- **Teste Automatizado**: No futuro, podemos adicionar testes automatizados ao Makefile para verificar o funcionamento de novos componentes à medida que o projeto evolui.
+- **Suporte a Várias Arquiteturas**: Expandir o Makefile para compilar o sistema operacional para outras arquiteturas, além do x86.
 
 ### Testando o Terminal
 
@@ -189,13 +193,5 @@ Para testar o terminal, você pode compilar o kernel com o código do shell e em
 - Gerenciamento básico de memória.
 - Interação com dispositivos de hardware.
 - Implementação de um sistema de arquivos rudimentar.
-- Expansão das funcionalidades do terminal com novos comandos.
+- Expansão das funcionalidades do terminal com novos
 
-## Referências
-
-- [OSDev Wiki](https://wiki.osdev.org)
-- Livro: **"Operating Systems: Three Easy Pieces"**
-
-## Licença
-
-Este projeto está em fase experimental e não possui uma licença formal no momento.

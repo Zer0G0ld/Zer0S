@@ -30,7 +30,7 @@ INTERRUPTS_SRC = $(SRC_DIR)/interrupts.c
 KERNEL_OBJS = $(OBJ_DIR)/kernel.o $(OBJ_DIR)/gdt.o $(OBJ_DIR)/interrupts.o $(GDT_ASM_OBJ)
 
 # Regras para compilar o código
-all: $(ISO_NAME)
+all: build $(ISO_NAME)
 
 $(ISO_NAME): $(KERNEL_BIN) $(BOOT_BIN)
 	@echo "Gerando a ISO..."
@@ -42,7 +42,7 @@ $(ISO_NAME): $(KERNEL_BIN) $(BOOT_BIN)
 
 $(KERNEL_BIN): $(KERNEL_OBJS)
 	@echo "Linkando o Kernel..."
-	$(LD) -T linker.ld $(KERNEL_OBJS) -o $(KERNEL_BIN)
+	$(LD) -melf_i386 -T linker.ld $(KERNEL_OBJS) -o $(KERNEL_BIN)
 
 $(OBJ_DIR)/kernel.o: $(KERNEL_SRC)
 	@echo "Compilando o Kernel..."
@@ -62,7 +62,7 @@ $(BOOT_BIN): $(BOOT_SRC)
 
 $(GDT_ASM_OBJ): $(GDT_ASM_SRC)
 	@echo "Compilando o GDT Assembly..."
-	nasm -f elf $(GDT_ASM_SRC) -o $(GDT_ASM_OBJ)
+	nasm -f elf32 $(GDT_ASM_SRC) -o $(GDT_ASM_OBJ)
 
 clean:
 	@echo "Limpando os arquivos de compilação..."
