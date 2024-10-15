@@ -2,7 +2,7 @@
 
 Este projeto é uma tentativa de criar um sistema operacional básico do zero. Ele envolve o desenvolvimento de um bootloader simples em Assembly e um kernel em C, utilizando o NASM para compilar o código Assembly e o GCC para o código C. O objetivo é construir um sistema operacional básico com funcionalidades iniciais, como um terminal simples para interações com o usuário.
 
-Para esse projeto, vou usar um outro repositório que estou desenvolvendo, o [ShellZer0](https://github.com/Zer0G0ld/ShellZer0), para ser um tipo de "Shell" deste SO.
+Para esse projeto, estou utilizando um outro repositório que estou desenvolvendo, o [ShellZer0](https://github.com/Zer0G0ld/ShellZer0), como terminal ("Shell") deste SO.
 
 > **Nota Importante**: Como o ShellZer0 é um submódulo, é importante saber como gerenciá-lo corretamente, especialmente ao clonar ou atualizar o repositório.
 
@@ -21,7 +21,11 @@ Zer0S/
 │   ├── gdt.h           # Arquivo de cabeçalho da GDT
 │   ├── isr.h           # Arquivo de cabeçalho dos tratadores de interrupção
 │   ├── idt.h           # Arquivo de cabeçalho da IDT
-│   ├── gdt.h           # Cabeçalho para GDT
+│   ├── keyboard.h      # Cabeçalho para teclado
+│   ├── ports.h         # Cabeçalho para operações de I/O
+│   ├── screen.h        # Cabeçalho para manipulação da tela
+│   ├── shell.h         # Cabeçalho do shell
+│   ├── utils.h         # Cabeçalho de funções utilitárias
 │   └── kernel.h        # Cabeçalho do kernel
 ├── build/              # Diretório onde os binários serão gerados
 │   ├── boot.bin        # Arquivo do bootloader compilado
@@ -32,6 +36,14 @@ Zer0S/
 ├── terminal/           # Código-fonte do terminal (shell)
 │   ├── shell.c         # Código do shell interativo
 │   ├── shell.h         # Cabeçalho do shell
+│   ├── setup.sh        # Script de configuração
+│   ├── LICENSE         # Licença do terminal
+│   ├── Makefile        # Arquivo Makefile para o terminal
+│   ├── README.md       # Documentação do terminal
+│   ├── src/            # Código-fonte do terminal
+│   ├── tests/          # Testes do terminal
+│   ├── build/          # Diretório de arquivos compilados
+│   └── img/            # Imagens e recursos gráficos do terminal
 ├── grub/               # Arquivos relacionados ao GRUB
 │   └── grub.cfg        # Arquivo de configuração do GRUB
 ├── README.md           # Documentação do projeto
@@ -41,7 +53,6 @@ Zer0S/
     └── boot/           # Diretórios para o GRUB e kernel dentro da imagem ISO
         └── grub/
             └── grub.cfg # Arquivo de configuração do GRUB na imagem ISO
-
 ```
 
 ## Requisitos
@@ -80,7 +91,7 @@ O kernel é um programa básico escrito em C que, quando carregado pelo bootload
 - O kernel opera no **modo protegido (32 bits)**.
 - Ele também escreve diretamente na memória de vídeo para exibir caracteres na tela.
 
-### Terminal (shell)
+### Terminal (ShellZer0)
 
 O projeto agora inclui um terminal (ou shell), que permite ao usuário interagir com o sistema operacional. O terminal é um loop que aguarda os comandos do usuário, processa-os e executa ações como exibir mensagens ou encerrar o sistema.
 
@@ -100,6 +111,14 @@ Acesse o diretório:
 
 ```bash
 cd Zer0S
+```
+
+### Gerenciando o Submódulo (ShellZer0)
+
+O `ShellZer0` é incluído como um submódulo Git. Após clonar o repositório, certifique-se de inicializar o submódulo:
+
+```bash
+git submodule update --init --recursive
 ```
 
 ## Compilando o Projeto
@@ -169,66 +188,12 @@ Para facilitar o processo de compilação, linkagem e execução, foi adicionado
 O **Makefile** foi configurado para automatizar os seguintes passos:
 
 1. Compilação do bootloader (código Assembly).
-2. Compilação do kernel (código C).
-3. Linkagem dos arquivos compilados (bootloader e kernel) para gerar um binário combinado.
-4. Criação da imagem ISO utilizando os arquivos necessários (bootloader, kernel e GRUB).
-5. Emulação do sistema operacional no QEMU.
+2. Compilação do kernel
 
-### Exemplo de Uso
-
-1. Para compilar o projeto:
-
-  ```bash
-  make
-  ```
-
-Isso irá compilar o bootloader e o kernel e gerar a ISO (`zer0.iso`) na pasta `build/`.
-
-2. Para rodar o sistema no QEMU após a compilação:
-
-  ```bash
-  make run
-  ```
-
-3. Para limpar os arquivos gerados e recompilar do zero:
-
-  ```bash
-  make clean
-  ```
-
-### Futuras Melhorias no Makefile
-
-- **Teste Automatizado**: No futuro, podemos adicionar testes automatizados ao Makefile para verificar o funcionamento de novos componentes à medida que o projeto evolui.
-- **Suporte a Várias Arquiteturas**: Expandir o Makefile para compilar o sistema operacional para outras arquiteturas, além do x86.
-
-### Testando o Terminal
-
-Para testar
-
- o terminal, após compilar o projeto, execute o comando `make run` e interaja com o terminal utilizando comandos simples como `hello` e `shutdown`.
-
-## Melhorias Futuras
-
-- **Sistema de Gerenciamento de Processos**: Planejo implementar a funcionalidade de gerenciamento de processos no kernel, permitindo que múltiplos programas sejam executados simultaneamente.
-- **Suporte a Múltiplos Terminais**: Aumentar a funcionalidade do terminal, permitindo que múltiplos terminais possam ser abertos simultaneamente.
-
-## Contribuições
-
-Contribuições são bem-vindas! Se você gostaria de contribuir para o projeto, basta seguir as etapas abaixo:
-
-1. Faça um fork deste repositório.
-2. Crie uma branch com sua feature ou correção.
-3. Envie um pull request com uma descrição clara da sua alteração.
+ (código C).
+3. Linkagem dos arquivos objeto gerados para formar o binário do sistema operacional.
+4. Geração da imagem ISO para execução em máquinas virtuais via QEMU.
 
 ## Licença
 
-Este projeto está licenciado sob a MIT License. Veja o arquivo LICENSE para mais informações.
-
-
-### Principais Modificações:
-- Uniformização dos títulos e formatação.
-- Adição de notas para alertar sobre etapas críticas (como o uso do submódulo).
-- Explicações mais claras sobre a instalação das dependências.
-- Descrição detalhada do Makefile e seus comandos.
-- Links e referências extras para facilitar a navegação e entendimento.
-
+Este projeto é licenciado sob a **MIT License** - consulte o arquivo `LICENSE` para mais detalhes.
