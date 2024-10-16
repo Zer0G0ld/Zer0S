@@ -62,7 +62,7 @@ void screen_put_char(char c) {
         cursor_y = 0;  // Simples rolagem de tela para cima
     }
 
-    screen_update_cursor();
+    screen_update_cursor();  // Atualiza a posição do cursor
 }
 
 // Função para atualizar a posição do cursor

@@ -11,9 +11,9 @@
 #define SCREEN_HEIGHT 25
 
 // Definições de cores para texto e fundo
-#define WHITE_ON_BLACK 0x0F00
-#define RED_ON_BLACK   0x04F0
-#define BLUE_ON_BLACK  0x01F0
+#define WHITE_ON_BLACK 0x0F00 // Cor de fundo preta com texto branco
+#define RED_ON_BLACK   0x04F0 // Cor de fundo preta com texto vermelho
+#define BLUE_ON_BLACK  0x01F0 // Cor de fundo preta com texto azul
 
 // Protótipos das funções
 void screen_clear();
