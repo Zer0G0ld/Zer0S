@@ -26,20 +26,16 @@ void isr_handler(registers_t regs) {
 
 // Função que instala as ISRs na IDT
 void isr_install() {
-    // Exemplo de como instalar as ISRs
-    set_idt_gate(IRQ0_DIVZERO, (uint32_t)isr0, 0x08, 0x8E);  // Registrar a ISR para a interrupção de divisão por zero
-    set_idt_gate(IRQ13_GENERAL, (uint32_t)isr_handler, 0x08, 0x8E); // Registrar a ISR para a exceção de proteção geral
-    set_idt_gate(IRQ14_PAGEFAULT, (uint32_t)isr_handler, 0x08, 0x8E); // Registrar a ISR para a falha de página
-    set_idt_gate(IRQ6_INVALID_OPCODE, (uint32_t)isr_handler, 0x08, 0x8E);  // Registrar a ISR para o erro de opcode inválido
-    set_idt_gate(IRQ3_BREAKPOINT, (uint32_t)isr_handler, 0x08, 0x8E);  // Registrar a ISR para o ponto de interrupção
-
-    // Adicione mais interrupções conforme necessário
+    // Instalar as ISRs para as interrupções
+    set_idt_gate(0, (uint32_t)isr0, 0x08, 0x8E);  // Exemplo para ISR0, ajustar para cada caso
+    // set_idt_gate(1, (uint32_t)isr1, 0x08, 0x8E);
+    // set_idt_gate(2, (uint32_t)isr2, 0x08, 0x8E);
+    // Adicionar mais interrupções conforme necessário
 }
 
 // Função que será chamada quando a interrupção de divisão por zero (ISR0) ocorrer
 void isr0(void) {
-    // No caso de divisão por zero, chamamos o manipulador para exibir a mensagem e parar o sistema
-    registers_t regs = {0};  // Inicializa a estrutura de registros com valores padrão
+    registers_t regs = {0};  // Inicializa a estrutura de registros
     regs.interrupt_number = IRQ0_DIVZERO;
     isr_handler(regs);  // Chama o manipulador de interrupção
 }
