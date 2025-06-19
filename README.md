@@ -8,7 +8,7 @@ Para esse projeto, estou utilizando um outro repositório que estou desenvolvend
 
 ## Estrutura do Projeto
 
-```
+```bash
 Zer0S/
 ├── boot/               # Código do bootloader em Assembly
 │   └── boot.asm        # Código do bootloader
