@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "ports.h"  // Necessário para outb()
 
 static uint8_t cursor_x = 0;
 static uint8_t cursor_y = 0;
@@ -6,14 +7,15 @@ static uint8_t cursor_y = 0;
 // Função para limpar a tela
 void screen_clear() {
     for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-        VIDEO_MEMORY[i] = WHITE_ON_BLACK;  // Limpar para fundo preto e texto branco
+        VIDEO_MEMORY[i] = (uint16_t)(' ' | WHITE_ON_BLACK);  // Espaço + cor
     }
     cursor_x = 0;
     cursor_y = 0;
-    screen_update_cursor();  // Atualizar a posição do cursor após limpar
+    screen_update_cursor();
 }
 
-// Função para escrever uma string na tela
+void screen_put_char(char c);
+
 void screen_write(const char* str) {
     unsigned int i = 0;
     while (str[i] != '\0') {
@@ -22,7 +24,6 @@ void screen_write(const char* str) {
     }
 }
 
-// Função para escrever um número inteiro na tela
 void screen_write_int(uint32_t num) {
     char buf[32];
     int i = 0;
@@ -37,13 +38,24 @@ void screen_write_int(uint32_t num) {
         num /= 10;
     }
 
-    // Imprimir o número na ordem correta
     for (int j = i - 1; j >= 0; j--) {
         screen_put_char(buf[j]);
     }
 }
 
-// Função para escrever um caractere na tela
+void screen_scroll() {
+    // Move as linhas para cima
+    for (int y = 1; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            VIDEO_MEMORY[(y - 1) * SCREEN_WIDTH + x] = VIDEO_MEMORY[y * SCREEN_WIDTH + x];
+        }
+    }
+    // Limpa a última linha
+    for (int x = 0; x < SCREEN_WIDTH; x++) {
+        VIDEO_MEMORY[(SCREEN_HEIGHT - 1) * SCREEN_WIDTH + x] = (uint16_t)(' ' | WHITE_ON_BLACK);
+    }
+}
+
 void screen_put_char(char c) {
     if (c == '\n') {
         cursor_x = 0;
@@ -59,27 +71,24 @@ void screen_put_char(char c) {
     }
 
     if (cursor_y >= SCREEN_HEIGHT) {
-        cursor_y = 0;  // Simples rolagem de tela para cima
+        screen_scroll();
+        cursor_y = SCREEN_HEIGHT - 1;
     }
 
-    screen_update_cursor();  // Atualiza a posição do cursor
+    screen_update_cursor();
 }
 
-// Função para atualizar a posição do cursor
 void screen_set_cursor(uint8_t x, uint8_t y) {
     cursor_x = x;
     cursor_y = y;
     screen_update_cursor();
 }
 
-// Função para atualizar o cursor no hardware
 void screen_update_cursor() {
     uint16_t position = cursor_y * SCREEN_WIDTH + cursor_x;
 
-    // Enviar a posição do cursor para as portas de controle
-    outb(0x3D4, 0x0F);  // Registrar de cursor
+    outb(0x3D4, 0x0F);
     outb(0x3D5, (uint8_t)(position & 0xFF));
-
-    outb(0x3D4, 0x0E);  // Registrar de cursor
+    outb(0x3D4, 0x0E);
     outb(0x3D5, (uint8_t)((position >> 8) & 0xFF));
 }

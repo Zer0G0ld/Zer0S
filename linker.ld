@@ -2,38 +2,40 @@ OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH(i386)
 ENTRY(kernel_main)
 
-MEMORY {
-    ram (rw) : ORIGIN = 0x00000000, LENGTH = 4M /* Ajuste o comprimento conforme necessário */
-}
-
 SECTIONS {
-    . = 1M; /* O kernel será carregado a partir de 1 MB */
+    /* O GRUB vai carregar o kernel a partir de 1 MiB (0x00100000) */
+    . = 1M;
 
-    /* Seção de código (somente leitura e execução) */
+    /* Seção Multiboot Header (precisa vir logo no início) */
+    .multiboot :
+    {
+        KEEP(*(.multiboot))
+    }
+
+    /* Código */
     .text ALIGN(4K) : {
-        *(.text)       /* Inclui todas as seções .text dos objetos */
+        *(.text)
     }
 
-    /* Seção de dados inicializados (leitura e escrita) */
+    /* Dados inicializados */
     .data ALIGN(4K) : {
-        *(.data)       /* Inclui todas as seções .data dos objetos */
+        *(.data)
     }
 
-    /* Seção de dados não inicializados (BSS) (leitura e escrita) */
+    /* Dados não inicializados (bss) */
     .bss ALIGN(4K) : {
-        *(.bss)        /* Inclui todas as seções .bss dos objetos */
+        *(.bss)
         *(COMMON)
     }
 
-    /* Seção da pilha */
+    /* Pilha (opcional - só pra marcar espaço, já que a pilha é criada manualmente no código C) */
     .stack ALIGN(4K) : {
-        . = . + 16K;    /* Define o tamanho da pilha (16KB) */
-    } >ram   /* Coloca a pilha na RAM */
+        . = . + 16K;
+    }
 
-    /* Símbolos de fim e início da pilha */
-    _stack_end = .;       /* O topo da pilha */
-    _stack_start = _stack_end - 16K; /* O início da pilha */
+    /* Símbolos úteis */
+    _stack_end = .;
+    _stack_start = _stack_end - 16K;
 
-    /* Definir o símbolo de término */
     _end = .;
 }

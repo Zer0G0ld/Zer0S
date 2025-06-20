@@ -4,73 +4,41 @@
 #include "shell.h"
 #include "screen.h"  // Para a exibição de texto no terminal
 
-/* Protótipo da função kernel_main */
-void kernel_main(void);
-
-
-/* Cabeçalho Multiboot */
-#define MULTIBOOT_HEADER_MAGIC   0x1BADB002
-#define MULTIBOOT_HEADER_FLAGS   0x0
-#define MULTIBOOT_HEADER_CHECKSUM (-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS))
-
-typedef struct multiboot_header {
-    uint32_t magic;
-    uint32_t flags;
-    uint32_t checksum;
-    uint32_t header_addr;
-    uint32_t load_addr;
-    uint32_t load_end_addr;
-    uint32_t bss_end_addr;
-    uint32_t entry_addr;
-} multiboot_header_t;
-
-typedef struct {
-    uint32_t esp;
-    uint32_t ebp;
-    // Outros registros e informações do processo
-} process_t;
-
-/* Definir o cabeçalho multiboot */
-multiboot_header_t __attribute__((section(".multiboot"))) multiboot_header = {
-    .magic = MULTIBOOT_HEADER_MAGIC,
-    .flags = MULTIBOOT_HEADER_FLAGS,
-    .checksum = MULTIBOOT_HEADER_CHECKSUM,
-    .header_addr = 0,
-    .load_addr = 0,
-    .load_end_addr = 0,
-    .bss_end_addr = 0,
-    .entry_addr = 0 // Inicialize como 0
+/* Multiboot Header - Para o GRUB carregar */
+__attribute__((section(".multiboot")))
+const uint32_t multiboot_header[] = {
+    0x1BADB002,                // magic
+    0x00,                // flags
+    -(0x1BADB002 + 0x00) // checksum
 };
-
-void shell_main() {
-    print_string("Welcome to ShellZer0!\n");
-    // Aqui você pode implementar o loop principal do shell
-    while (1) {
-        // Aguardar comandos e executá-los
-    }
-}
 
 /* Função para limpar a tela com cor de fundo e texto configuráveis */
 void clear_screen(uint8_t bg_color, uint8_t fg_color) {
-    uintptr_t vidptr = 0xb8000; // Endereço de vídeo da tela
-    uint16_t color = (bg_color << 4) | fg_color; // Combina cores de fundo e texto
+    uintptr_t vidptr = 0xb8000; // Endereço de vídeo da tela (modo texto)
+    uint16_t color = (bg_color << 4) | fg_color;
 
-    // Limpa a tela
     for (unsigned int i = 0; i < 80 * 25; ++i) {
-        *((uint16_t*)vidptr + i) = (uint16_t)(color | ' '); // Caractere ' ' com a cor definida
+        *((uint16_t*)vidptr + i) = (uint16_t)(color | ' ');
     }
 }
 
 /* Função para imprimir uma string na tela */
 void print_string(const char *str) {
-    uintptr_t vidptr = 0xb8000; // Endereço de vídeo da tela
+    uintptr_t vidptr = 0xb8000;
     unsigned int i = 0;
 
-    // Percorre a string e imprime cada caractere
     while (str[i] != '\0') {
-        *((char*)vidptr + i * 2) = str[i];       // Coloca o caractere
-        *((char*)vidptr + i * 2 + 1) = 0x07;    // Cor (branco sobre fundo preto)
+        *((char*)vidptr + i * 2) = str[i];
+        *((char*)vidptr + i * 2 + 1) = 0x07; // Cor: branco no fundo preto
         ++i;
+    }
+}
+
+/* Shell básico */
+void shell_main() {
+    print_string("\nWelcome to ShellZer0!\n");
+    while (1) {
+        // Loop infinito de shell (por enquanto só exibe a mensagem)
     }
 }
 
@@ -78,21 +46,29 @@ void print_string(const char *str) {
 void kernel_main(void) {
     const char *str = "Hello, OS World!";
 
-    // Inicializa o entry_addr após o kernel ser carregado
-    multiboot_header.entry_addr = (uintptr_t)&kernel_main;
+    gdt_init();           // Inicializar a GDT
+    interrupts_init();    // Inicializar as interrupções
 
-    // Inicializa a GDT (agora corretamente chamada de gdt_init de gdt.c)
-    gdt_init();  // Chama a função de inicialização da GDT de gdt.c
+    clear_screen(0x00, 0x0F);  // Limpar a tela (fundo preto, texto branco)
+    print_string(str);         // Exibir texto inicial
 
-    // Inicializa as interrupções
-    interrupts_init();
-    
-    clear_screen(0x00, 0x0F);       // Limpa a tela com fundo preto e texto branco
-    print_string(str);    // Exibe a string
+    shell_main();              // Entrar no shell
 
-    // Inicia o terminal ShellZer0
-    shell_main(); // Chama a função do terminal para interação com o usuário
-
-    // Fica preso no laço, para que o kernel não termine
-    while (1) { }
+    while (1) {}               // Loop eterno (só por segurança)
 }
+
+/*
+void kernel_main(void) {
+    volatile char *video = (volatile char *)0xB8000;
+    video[0] = 'Z';
+    video[1] = 0x07; // cor branca sobre preto
+    video[2] = 'E';
+    video[3] = 0x07;
+    video[4] = 'R';
+    video[5] = 0x07;
+    video[6] = '0';
+    video[7] = 0x07;
+
+    while(1) {}
+}
+*/

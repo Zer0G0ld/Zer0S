@@ -30,7 +30,7 @@ Zer0S/
 ├── build/              # Diretório onde os binários serão gerados
 │   ├── boot.bin        # Arquivo do bootloader compilado
 │   ├── kernel.o        # Arquivo objeto do kernel
-│   ├── kernel.bin      # Arquivo binário do kernel
+│   ├──       # Arquivo binário do kernel
 │   ├── myos.iso        # Imagem ISO gerada
 │   └── boot.img        # Imagem IMG (se necessário)
 ├── terminal/           # Código-fonte do terminal (shell)
