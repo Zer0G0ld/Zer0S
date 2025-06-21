@@ -36,6 +36,14 @@ void print_string(const char *str) {
     }
 }
 
+void trigger_gpf() {
+    asm volatile (
+        "mov $0x23, %ax\n\t"  // Seletor de segmento inválido
+        "mov %ax, %ds\n\t"
+    );
+}
+
+
 /* Shell básico */
 void shell_main() {
     print_string("\nWelcome to ShellZer0!\n");

@@ -26,7 +26,7 @@ typedef struct {
 
 // Protótipos das funções ISR
 void isr_install();
-void isr_handler(registers_t regs);
+void isr_handler(registers_t* regs);
 
 // Declaração das funções ISR (implementadas em assembly)
 extern void isr0(void);

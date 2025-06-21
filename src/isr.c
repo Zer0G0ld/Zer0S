@@ -37,36 +37,59 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
+char *exception_messages[] = {
+    "Divisao por zero!",
+    "Debug Exception",
+    "Interrupcao NMI",
+    "Breakpoint Exception",
+    "Overflow Exception",
+    "Bound Range Exceeded",
+    "Opcode Invalido",
+    "Dispositivo Nao Disponivel (FPU)",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "TSS Invalido",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "Falha de Protecao Geral",
+    "Page Fault",
+    "Interrupcao Reservada",
+    "Erro de Floating-Point",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point Exception",
+    "Virtualization Exception",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Interrupcao Reservada",
+    "Security Exception",
+    "Interrupcao Reservada"
+};
+
+
 // Manipulador central para todas as ISRs
-void isr_handler(registers_t regs) {
+void isr_handler(registers_t* regs) {
     screen_clear();
     screen_write("Interrupcao: ");
-    screen_write_int(regs.interrupt_number);
+    screen_write_int(regs->interrupt_number);
     screen_write("\n");
 
-    switch (regs.interrupt_number) {
-        case IRQ0_DIVZERO:
-            screen_write("Erro de Divisao por Zero!\n");
-            break;
-        case IRQ13_GENERAL:
-            screen_write("Erro de Protecao Geral!\n");
-            break;
-        case IRQ14_PAGEFAULT:
-            screen_write("Erro de Falha de Pagina!\n");
-            break;
-        case IRQ6_INVALID_OPCODE:
-            screen_write("Erro de Opcode Invalido!\n");
-            break;
-        case IRQ3_BREAKPOINT:
-            screen_write("Ponto de Interrupcao!\n");
-            break;
-        default:
-            screen_write("Interrupcao Desconhecida!\n");
-            break;
+    if (regs->interrupt_number < 32) {
+        screen_write(exception_messages[regs->interrupt_number]);
+        screen_write("\n");
+    } else {
+        screen_write("Interrupcao de Hardware ou Desconhecida!\n");
     }
 
     while (1) {} // Loop infinito para travar o sistema na falha
 }
+
 
 // Instalação das ISRs na IDT
 void isr_install() {
