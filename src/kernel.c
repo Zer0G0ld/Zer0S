@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "gdt.h"
-#include "interrupts.h"
+#include "idt.h"
+#include "isr.h"
+#include "irq.h"
 #include "shell.h"
 #include "screen.h"  // Para a exibição de texto no terminal
 
@@ -8,8 +10,8 @@
 __attribute__((section(".multiboot")))
 const uint32_t multiboot_header[] = {
     0x1BADB002,                // magic
-    0x00,                // flags
-    -(0x1BADB002 + 0x00) // checksum
+    0x00,                      // flags
+    -(0x1BADB002 + 0x00)       // checksum
 };
 
 /* Função para limpar a tela com cor de fundo e texto configuráveis */
@@ -46,29 +48,18 @@ void shell_main() {
 void kernel_main(void) {
     const char *str = "Hello, OS World!";
 
-    gdt_init();           // Inicializar a GDT
-    interrupts_init();    // Inicializar as interrupções
+    gdt_init();         // Inicializar a GDT
+    idt_init();         // Inicializar a estrutura da IDT
+    pic_remap();        // Remapear as IRQs (PIC)
+    isr_install();      // Instalar ISRs (0-31)
+    irq_install();      // Instalar IRQs (32-47)
 
-    clear_screen(0x00, 0x0F);  // Limpar a tela (fundo preto, texto branco)
+    asm volatile("sti");  // Habilitar interrupções
+
+    clear_screen(0x00, 0x0F);  // Limpar a tela (preto fundo, branco texto)
     print_string(str);         // Exibir texto inicial
 
     shell_main();              // Entrar no shell
 
-    while (1) {}               // Loop eterno (só por segurança)
+    while (1) {}               // Loop eterno
 }
-
-/*
-void kernel_main(void) {
-    volatile char *video = (volatile char *)0xB8000;
-    video[0] = 'Z';
-    video[1] = 0x07; // cor branca sobre preto
-    video[2] = 'E';
-    video[3] = 0x07;
-    video[4] = 'R';
-    video[5] = 0x07;
-    video[6] = '0';
-    video[7] = 0x07;
-
-    while(1) {}
-}
-*/

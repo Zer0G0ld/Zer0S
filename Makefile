@@ -8,6 +8,8 @@ BIN_DIR = build/bin
 ISO_DIR = iso
 ISO_NAME = build/zer0s.iso
 KERNEL_BIN = $(BIN_DIR)/kernel.elf
+ISR_STUB_ASM_SRC = src/isr_stub.asm
+ISR_STUB_ASM_OBJ = $(OBJ_DIR)/isr_stub.o
 
 CFLAGS = -ffreestanding -m32 -nostdlib -nostartfiles -Wall -Wextra -O2 -Iinclude -Isrc -Iterminal
 ASFLAGS = -f elf32
@@ -16,8 +18,8 @@ LDFLAGS = -T linker.ld
 GDT_ASM_SRC = src/gdt_flush.asm
 GDT_ASM_OBJ = $(OBJ_DIR)/gdt_flush.o
 
-SRC_FILES = $(SRC_DIR)/kernel.c $(SRC_DIR)/gdt.c $(SRC_DIR)/idt.c $(SRC_DIR)/isr.c $(SRC_DIR)/interrupts.c $(SRC_DIR)/keyboard.c $(SRC_DIR)/screen.c
-OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(notdir $(SRC_FILES:.c=.o))) $(GDT_ASM_OBJ)
+SRC_FILES = $(SRC_DIR)/kernel.c $(SRC_DIR)/gdt.c $(SRC_DIR)/idt.c $(SRC_DIR)/isr.c $(SRC_DIR)/irq.c $(SRC_DIR)/interrupts.c $(SRC_DIR)/keyboard.c $(SRC_DIR)/screen.c
+OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(notdir $(SRC_FILES:.c=.o))) $(GDT_ASM_OBJ) $(ISR_STUB_ASM_OBJ)
 
 # ========================
 # Regras de Build
@@ -36,6 +38,10 @@ $(BIN_DIR):
 $(ISO_DIR)/boot/grub:
 	@echo "[+] Criando estrutura de diretórios ISO: $@"
 	mkdir -p $(ISO_DIR)/boot/grub
+
+$(ISR_STUB_ASM_OBJ): $(ISR_STUB_ASM_SRC) | $(OBJ_DIR)
+	@echo "[+] Montando isr_stub.asm: $<"
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(KERNEL_BIN): $(OBJ_FILES) | $(BIN_DIR)
 	@echo "[+] Linkando Kernel..."
