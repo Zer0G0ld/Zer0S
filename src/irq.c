@@ -1,5 +1,7 @@
 #include "idt.h"
 #include "irq.h"
+#include "isr.h"
+#include "keyboard.h"
 
 #define PIC1 0x20
 #define PIC2 0xA0
@@ -48,4 +50,16 @@ void irq_install() {
     set_idt_gate(45, (uint32_t)irq13, 0x08, 0x8E);
     set_idt_gate(46, (uint32_t)irq14, 0x08, 0x8E);
     set_idt_gate(47, (uint32_t)irq15, 0x08, 0x8E);
+}
+
+void irq_handler(registers_t* regs) {
+    if (regs->interrupt_number == 33) { // IRQ1 (teclado)
+        keyboard_handler();
+    }
+
+    // Enviar EOI (End of Interrupt) pro PIC
+    if (regs->interrupt_number >= 40) {
+        outb(0xA0, 0x20);   // EOI para o slave PIC
+    }
+    outb(0x20, 0x20);       // EOI para o master PIC
 }

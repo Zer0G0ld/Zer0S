@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "screen.h"       // Biblioteca para exibição de mensagens na tela
 #include "interrupts.h"   // Arquivo que registra a IDT
+#include "kernel.h"
 
 // Declaração das ISRs em assembly (32 ISRs)
 extern void isr0();
@@ -83,13 +84,18 @@ void isr_handler(registers_t* regs) {
     if (regs->interrupt_number < 32) {
         screen_write(exception_messages[regs->interrupt_number]);
         screen_write("\n");
+        // Se tiver um código de erro, exiba:
+        if (regs->interrupt_number == 14) {  // Page Fault, por exemplo
+            screen_write("Codigo de erro: ");
+            screen_write_int(regs->error_code);
+            screen_write("\n");
+        }
     } else {
         screen_write("Interrupcao de Hardware ou Desconhecida!\n");
     }
 
-    while (1) {} // Loop infinito para travar o sistema na falha
+    kernel_panic(exception_messages[regs->interrupt_number]);
 }
-
 
 // Instalação das ISRs na IDT
 void isr_install() {
