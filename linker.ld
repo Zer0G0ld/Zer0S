@@ -28,14 +28,15 @@ SECTIONS {
         *(COMMON)
     }
 
-    /* Pilha (opcional - só pra marcar espaço, já que a pilha é criada manualmente no código C) */
+    /* Espaço reservado para a pilha (16 KB), alinhado em 4 KB */
     .stack ALIGN(4K) : {
-        . = . + 16K;
+        . = . + 16K;        /* reserva 16KB para pilha */
     }
 
-    /* Símbolos úteis */
-    _stack_end = .;
-    _stack_start = _stack_end - 16K;
+    /* Símbolos para marcar os limites da pilha */
+    _stack_end = .;          /* topo da pilha (endereço mais alto) */
+    _stack_start = _stack_end - 16K; /* início da pilha */
 
+    /* Símbolo para o fim do kernel */
     _end = .;
 }

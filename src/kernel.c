@@ -7,6 +7,7 @@
 #include "screen.h"
 #include "keyboard.h"
 #include "kernel.h"
+#include <stddef.h>
 
 void clear_screen(uint8_t bg_color, uint8_t fg_color);
 
@@ -40,21 +41,36 @@ void clear_screen(uint8_t bg_color, uint8_t fg_color) {
     uint16_t color = (bg_color << 4) | fg_color;
 
     for (unsigned int i = 0; i < 80 * 25; ++i) {
-        *((uint16_t*)vidptr + i) = (uint16_t)(color | ' ');
+        *((uint16_t*)vidptr + i) = (uint16_t)(color << 8 | ' ');
     }
 }
 
 void print_string(const char *str) {
-    uintptr_t vidptr = 0xb8000;
-    unsigned int i = 0;
+    static uint16_t *vidmem = (uint16_t*)0xb8000;
+    static uint8_t x = 0, y = 0;
+    uint16_t attr = 0x0F;  // Texto branco sobre fundo preto
 
-    while (str[i] != '\0') {
-        *((char*)vidptr + i * 2) = str[i];
-        *((char*)vidptr + i * 2 + 1) = 0x07;
-        ++i;
+    for (size_t i = 0; str[i] != '\0'; i++) {
+        if (str[i] == '\n') {
+            x = 0;
+            y++;
+        } else {
+            vidmem[y * 80 + x] = (attr << 8) | str[i];
+            x++;
+            if (x >= 80) {
+                x = 0;
+                y++;
+            }
+        }
+
+        if (y >= 25) {
+            x = 0;
+            y = 0;
+        }
     }
 }
 
+// Função dummy para forçar General Protection Fault (testar ISR)
 void trigger_gpf() {
     asm volatile (
         "mov $0x23, %ax\n\t"
@@ -66,6 +82,13 @@ void shell_main() {
     print_string("\nWelcome to ShellZer0!\n> ");
 
     while (1) {
+        // Aqui você precisa implementar a leitura do teclado para preencher input_buffer
+        // Por hora só para debug, vamos simular que não entra nada e evitar travar.
+
+        // DEBUG: só imprime prompt e espera (sem input real)
+        // Comente o bloco abaixo se implementar teclado:
+        asm volatile("hlt");
+
         if (input_index > 0 && input_buffer[input_index - 1] == '\n') {
             input_buffer[input_index - 1] = '\0';
 
@@ -89,20 +112,34 @@ void shell_main() {
 }
 
 void kernel_main(void) {
-    const char *str = "Hello, OS World!";
+    clear_screen(0x01, 0x0F);
+    print_string("Kernel iniciado...\n");
 
-    gdt_init();
+    print_string("Inicializando IDT...\n");
     idt_init();
+    print_string("IDT inicializada.\n");
+
+    print_string("Remapeando PIC...\n");
     pic_remap();
+    print_string("PIC remapeado.\n");
+
+    print_string("Instalando ISRs...\n");
     isr_install();
+    print_string("ISRs instaladas.\n");
+
+    print_string("Instalando IRQs...\n");
     irq_install();
+    print_string("IRQs instaladas.\n");
 
     asm volatile("sti");
+    print_string("Interrupcoes habilitadas.\n");
 
-    clear_screen(0x00, 0x0F);
-    print_string(str);
-
+    print_string("Shell iniciando...\n");
     shell_main();
 
-    while (1) {}
+    // Nunca deve chegar aqui
+    print_string("Fim do kernel_main\n");
+    while (1) {
+        asm volatile("hlt");
+    }
 }
