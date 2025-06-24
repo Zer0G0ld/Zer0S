@@ -92,6 +92,10 @@ void shell_main() {
         if (input_index > 0 && input_buffer[input_index - 1] == '\n') {
             input_buffer[input_index - 1] = '\0';
 
+            print_string("\nBuffer recebido: ");
+            print_string(input_buffer);
+            print_string("\n> ");
+
             if (string_compare(input_buffer, "clear")) {
                 clear_screen(0x00, 0x0F);
                 print_string("> ");

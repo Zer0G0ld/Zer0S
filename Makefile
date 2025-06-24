@@ -18,7 +18,7 @@ LDFLAGS = -T linker.ld
 GDT_ASM_SRC = src/gdt_flush.asm
 GDT_ASM_OBJ = $(OBJ_DIR)/gdt_flush.o
 
-SRC_FILES = $(SRC_DIR)/kernel.c $(SRC_DIR)/gdt.c $(SRC_DIR)/idt.c $(SRC_DIR)/isr.c $(SRC_DIR)/irq.c $(SRC_DIR)/interrupts.c $(SRC_DIR)/keyboard.c $(SRC_DIR)/screen.c
+SRC_FILES = $(SRC_DIR)/kernel.c $(SRC_DIR)/gdt.c $(SRC_DIR)/idt.c $(SRC_DIR)/isr.c $(SRC_DIR)/irq.c $(SRC_DIR)/interrupts.c $(SRC_DIR)/keyboard.c $(SRC_DIR)/screen.c $(SRC_DIR)/utils.c
 OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(notdir $(SRC_FILES:.c=.o))) $(GDT_ASM_OBJ) $(ISR_STUB_ASM_OBJ)
 
 # ========================

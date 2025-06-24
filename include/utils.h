@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-// Declaração da função de comparação de strings
-int strcmp_impl(const char *str1, const char *str2);
+void itoa(uint32_t value, char* str, int base);
 
-#endif // UTILS_H
+#endif
