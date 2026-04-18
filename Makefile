@@ -6,7 +6,9 @@ AS := nasm
 LD := $(PREFIX)/bin/x86_64-elf-ld
 
 CFLAGS := -ffreestanding -nostdlib -nostdinc -O2 -Wall -Wextra \
-          -Ikernel/include -mno-red-zone -mgeneral-regs-only \
+          -Ikernel/include \
+          -Ikernel/arch/x86_64 \
+          -mno-red-zone -mgeneral-regs-only \
           -mcmodel=large -fno-stack-protector
 
 LDFLAGS := -n -T linker.ld
@@ -15,12 +17,30 @@ BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
 # Object files
-OBJS := $(OBJ_DIR)/boot.o $(OBJ_DIR)/kernel_main.o
+OBJS := $(OBJ_DIR)/boot.o \
+        $(OBJ_DIR)/kernel_main.o \
+        $(OBJ_DIR)/idt.o \
+        $(OBJ_DIR)/isr.o \
+        $(OBJ_DIR)/isr_default.o \
+        $(OBJ_DIR)/keyboard.o \
+        $(OBJ_DIR)/pic.o
 
 # Rules
 $(OBJ_DIR)/boot.o: kernel/arch/x86_64/boot.asm
 	@mkdir -p $(OBJ_DIR)
 	nasm -f elf64 $< -o $@
+
+$(OBJ_DIR)/isr.o: kernel/arch/x86_64/isr.asm
+	@mkdir -p $(OBJ_DIR)
+	nasm -f elf64 $< -o $@
+
+$(OBJ_DIR)/isr_default.o: kernel/arch/x86_64/isr_default.asm
+	@mkdir -p $(OBJ_DIR)
+	nasm -f elf64 $< -o $@
+
+$(OBJ_DIR)/%.o: kernel/arch/x86_64/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/kernel_main.o: kernel/kernel_main.c
 	@mkdir -p $(OBJ_DIR)
