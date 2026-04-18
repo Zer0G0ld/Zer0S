@@ -23,7 +23,8 @@ OBJS := $(OBJ_DIR)/boot.o \
         $(OBJ_DIR)/isr.o \
         $(OBJ_DIR)/isr_default.o \
         $(OBJ_DIR)/keyboard.o \
-        $(OBJ_DIR)/pic.o
+        $(OBJ_DIR)/pic.o \
+        $(OBJ_DIR)/isr_c.o
 
 # Rules
 $(OBJ_DIR)/boot.o: kernel/arch/x86_64/boot.asm
@@ -37,6 +38,10 @@ $(OBJ_DIR)/isr.o: kernel/arch/x86_64/isr.asm
 $(OBJ_DIR)/isr_default.o: kernel/arch/x86_64/isr_default.asm
 	@mkdir -p $(OBJ_DIR)
 	nasm -f elf64 $< -o $@
+
+$(OBJ_DIR)/isr_c.o: kernel/arch/x86_64/isr.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: kernel/arch/x86_64/%.c
 	@mkdir -p $(OBJ_DIR)

@@ -1,5 +1,6 @@
 #include "idt.h"
 #include "keyboard.h"
+#include "io.h"
 #include <stdint.h>
 
 // Register structure for interrupt context
@@ -11,7 +12,7 @@ typedef struct {
 } registers_t;
 
 // Array of exception messages
-const char* exception_messages[] = {
+static const char* exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -46,10 +47,10 @@ const char* exception_messages[] = {
     "Reserved"
 };
 
-// External VGA functions (from kernel_main.c)
+// External VGA functions
 extern void terminal_writestring(const char* str);
 extern void terminal_writechar(char c);
-extern void print_hex(uint64_t value);
+extern void print_hex(unsigned long long value);
 
 // ISR handler
 void isr_handler(registers_t* regs) {
@@ -101,8 +102,8 @@ void irq_handler(registers_t* regs) {
     // Send EOI to PIC
     if (regs->int_no >= 40) {
         // Send to slave
-        __asm__ volatile ("mov $0x20, %al; out %al, $0xA0");
+        outb(0xA0, 0x20);
     }
     // Send to master
-    __asm__ volatile ("mov $0x20, %al; out %al, $0x20");
+    outb(0x20, 0x20);
 }
