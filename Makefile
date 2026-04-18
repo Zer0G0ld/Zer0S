@@ -16,15 +16,21 @@ LDFLAGS := -n -T linker.ld
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
-# Object files
-OBJS := $(OBJ_DIR)/boot.o \
-        $(OBJ_DIR)/kernel_main.o \
-        $(OBJ_DIR)/idt.o \
-        $(OBJ_DIR)/isr.o \
-        $(OBJ_DIR)/isr_default.o \
-        $(OBJ_DIR)/keyboard.o \
-        $(OBJ_DIR)/pic.o \
-        $(OBJ_DIR)/isr_c.o
+# All C files in kernel/arch/x86_64/
+C_FILES := $(wildcard kernel/arch/x86_64/*.c)
+C_OBJS := $(patsubst kernel/arch/x86_64/%.c, $(OBJ_DIR)/%.o, $(C_FILES))
+
+# Assembly files
+ASM_FILES := kernel/arch/x86_64/boot.asm \
+             kernel/arch/x86_64/isr.asm \
+             kernel/arch/x86_64/isr_default.asm
+ASM_OBJS := $(patsubst kernel/arch/x86_64/%.asm, $(OBJ_DIR)/%.o, $(ASM_FILES))
+
+# Kernel main
+KERNEL_MAIN := $(OBJ_DIR)/kernel_main.o
+
+# All objects
+OBJS := $(ASM_OBJS) $(C_OBJS) $(KERNEL_MAIN)
 
 # Rules
 $(OBJ_DIR)/boot.o: kernel/arch/x86_64/boot.asm
@@ -38,10 +44,6 @@ $(OBJ_DIR)/isr.o: kernel/arch/x86_64/isr.asm
 $(OBJ_DIR)/isr_default.o: kernel/arch/x86_64/isr_default.asm
 	@mkdir -p $(OBJ_DIR)
 	nasm -f elf64 $< -o $@
-
-$(OBJ_DIR)/isr_c.o: kernel/arch/x86_64/isr.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: kernel/arch/x86_64/%.c
 	@mkdir -p $(OBJ_DIR)

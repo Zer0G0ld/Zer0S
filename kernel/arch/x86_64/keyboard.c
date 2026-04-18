@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "shell.h"
 #include "io.h"
 #include <stdint.h>
 
@@ -16,25 +17,22 @@ static const char scancode_to_ascii[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
 // Keyboard state
 static int shift_pressed = 0;
 static int caps_lock = 0;
 
+// Command buffer for shell
+static char cmd_buffer[256];
+static int cmd_pos = 0;
+
 // External VGA functions
 extern void terminal_writechar(char c);
 extern void terminal_writestring(const char* str);
+extern void shell_handle_command(char* input);
 
 uint8_t keyboard_read_scancode(void) {
-    // Wait for keyboard data to be ready
     while (!(inb(KEYBOARD_STATUS_PORT) & 1));
     return inb(KEYBOARD_DATA_PORT);
 }
@@ -55,11 +53,32 @@ void keyboard_handler(void) {
         return;
     }
     
-    // Only handle key press events
+    // Handle Enter key
+    if (key == 0x1C && pressed) {
+        terminal_writechar('\n');
+        cmd_buffer[cmd_pos] = '\0';
+        shell_handle_command(cmd_buffer);
+        cmd_pos = 0;
+        cmd_buffer[0] = '\0';
+        return;
+    }
+    
+    // Handle Backspace
+    if (key == 0x0E && pressed) {
+        if (cmd_pos > 0) {
+            cmd_pos--;
+            terminal_writechar('\b');
+            terminal_writechar(' ');
+            terminal_writechar('\b');
+        }
+        return;
+    }
+    
+    // Only handle key press events for regular keys
     if (pressed) {
         char ascii = scancode_to_ascii[key];
         
-        if (ascii) {
+        if (ascii && ascii >= ' ') {  // Printable characters
             // Apply shift/caps modifications
             if (shift_pressed || caps_lock) {
                 if (ascii >= 'a' && ascii <= 'z') {
@@ -67,12 +86,9 @@ void keyboard_handler(void) {
                 }
             }
             
-            // Handle backspace
-            if (ascii == '\b') {
-                terminal_writechar('\b');
-                terminal_writechar(' ');
-                terminal_writechar('\b');
-            } else {
+            // Add to command buffer
+            if (cmd_pos < 255) {
+                cmd_buffer[cmd_pos++] = ascii;
                 terminal_writechar(ascii);
             }
         }

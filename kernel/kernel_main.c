@@ -3,6 +3,7 @@
 #include "idt.h"
 #include "keyboard.h"
 #include "pic.h"
+#include "shell.h"
 
 // VGA functions
 #define VGA_MEMORY ((unsigned short*)0xB8000)
@@ -61,7 +62,6 @@ void print_hex(unsigned long long value) {
     terminal_writechar('0');
     terminal_writechar('x');
     
-    // Skip leading zeros
     int started = 0;
     for (int j = 60; j >= 0; j -= 4) {
         char digit = hex[(value >> j) & 0xF];
@@ -101,12 +101,8 @@ void kernel_main(unsigned long magic, unsigned long addr) {
     __asm__ volatile ("sti");
     terminal_writestring("[OK] Interrupts enabled\n\n");
     
-    terminal_writestring("========================================\n");
-    terminal_writestring("  System Ready!\n");
-    terminal_writestring("  Try typing something...\n");
-    terminal_writestring("========================================\n\n");
-    
-    terminal_writestring("Zer0S> ");
+    // Start shell
+    shell_init();
     
     while (1) {
         __asm__ volatile ("hlt");
