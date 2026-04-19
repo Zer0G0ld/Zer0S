@@ -25,7 +25,8 @@ OBJS := $(OBJ_DIR)/boot.o \
         $(OBJ_DIR)/keyboard.o \
         $(OBJ_DIR)/pic.o \
         $(OBJ_DIR)/shell.o \
-        $(OBJ_DIR)/kernel_main.o
+        $(OBJ_DIR)/kernel_main.o \
+		$(OBJ_DIR)/memory.o
 
 # Rules
 $(OBJ_DIR)/boot.o: kernel/arch/x86_64/boot.asm

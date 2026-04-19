@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include "pic.h"
 #include "shell.h"
+#include "memory.h"
 
 // VGA functions
 #define VGA_MEMORY ((unsigned short*)0xB8000)
@@ -95,6 +96,21 @@ void kernel_main(unsigned long magic, unsigned long addr) {
     // Initialize keyboard
     terminal_writestring("[INFO] Initializing keyboard...\n");
     keyboard_init();
+    
+    // Initialize memory manager
+    terminal_writestring("[INFO] Initializing memory manager...\n");
+    memory_init(addr, 0);  // Use 'addr' from multiboot
+    terminal_writestring("[OK] Memory manager initialized\n");
+    
+    // Test kmalloc
+    char* test = kmalloc(64);
+    if (test) {
+        terminal_writestring("[TEST] kmalloc(64) successful at address: ");
+        print_hex((uint64_t)test);
+        terminal_writestring("\n");
+        kfree(test);
+        terminal_writestring("[TEST] kfree() successful\n");
+    }
     
     // Enable interrupts
     terminal_writestring("[INFO] Enabling interrupts...\n");

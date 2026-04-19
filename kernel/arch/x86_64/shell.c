@@ -1,10 +1,17 @@
 #include "shell.h"
+#include "memory.h"  // Adicionar este include!
 
 // External VGA functions
 extern void terminal_writestring(const char* str);
 extern void terminal_writechar(char c);
 extern void terminal_clear(void);
 extern void print_hex(unsigned long long value);
+
+// External memory functions
+extern void memory_status(void);
+extern void heap_status(void);
+extern void* kmalloc(size_t size);
+extern void kfree(void* ptr);
 
 // Simple string compare
 static int string_compare(const char* s1, const char* s2) {
@@ -26,6 +33,9 @@ static void cmd_help(void) {
     terminal_writestring("  status    - Show system status\n");
     terminal_writestring("  hex       - Show number in hex\n");
     terminal_writestring("  about     - About Zer0S\n");
+    terminal_writestring("  mem       - Show memory status\n");
+    terminal_writestring("  heap      - Show heap status\n");
+    terminal_writestring("  kmalloc   - Allocate memory\n");
 }
 
 static void cmd_info(void) {
@@ -74,6 +84,7 @@ static void cmd_about(void) {
     terminal_writestring("  - PS/2 Keyboard driver\n");
     terminal_writestring("  - VGA Text Mode\n");
     terminal_writestring("  - Interactive Shell\n");
+    terminal_writestring("  - Memory Management\n");
     terminal_writestring("========================\n");
 }
 
@@ -86,6 +97,24 @@ static void cmd_reboot(void) {
     );
     while (1) {
         __asm__ volatile ("hlt");
+    }
+}
+
+static void cmd_kmalloc(char* args) {
+    // Parse size from args
+    size_t size = 0;
+    for (int i = 0; args[i] >= '0' && args[i] <= '9'; i++) {
+        size = size * 10 + (args[i] - '0');
+    }
+    if (size > 0) {
+        void* ptr = kmalloc(size);
+        terminal_writestring("\nAllocated ");
+        print_hex(size);
+        terminal_writestring(" bytes at ");
+        print_hex((uint64_t)ptr);
+        terminal_writestring("\n");
+    } else {
+        terminal_writestring("\nUsage: kmalloc <size>\n");
     }
 }
 
@@ -114,6 +143,15 @@ void shell_handle_command(char* input) {
     // Execute command
     if (string_compare(cmd, "help") == 0) {
         cmd_help();
+    }
+    else if (string_compare(cmd, "mem") == 0) {
+        memory_status();
+    }
+    else if (string_compare(cmd, "heap") == 0) {
+        heap_status();
+    }
+    else if (string_compare(cmd, "kmalloc") == 0) {
+        cmd_kmalloc(args);
     }
     else if (string_compare(cmd, "clear") == 0) {
         terminal_clear();
