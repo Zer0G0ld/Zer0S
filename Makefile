@@ -26,9 +26,19 @@ OBJS := $(OBJ_DIR)/boot.o \
         $(OBJ_DIR)/pic.o \
         $(OBJ_DIR)/shell.o \
         $(OBJ_DIR)/kernel_main.o \
-		$(OBJ_DIR)/memory.o
+        $(OBJ_DIR)/memory.o \
+        $(OBJ_DIR)/syscall.o \
+        $(OBJ_DIR)/process.o \
+        $(OBJ_DIR)/scheduler.o \
+        $(OBJ_DIR)/ipc.o \
+		$(OBJ_DIR)/switch.o \
+		$(OBJ_DIR)/string.o
 
 # Rules
+$(OBJ_DIR)/%.o: kernel/core/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJ_DIR)/boot.o: kernel/arch/x86_64/boot.asm
 	@mkdir -p $(OBJ_DIR)
 	nasm -f elf64 $< -o $@
@@ -52,6 +62,10 @@ $(OBJ_DIR)/%.o: kernel/arch/x86_64/%.c
 $(OBJ_DIR)/kernel_main.o: kernel/kernel_main.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/switch.o: kernel/arch/x86_64/switch.asm
+	@mkdir -p $(OBJ_DIR)
+	nasm -f elf64 $< -o $@
 
 .PHONY: all clean iso run
 

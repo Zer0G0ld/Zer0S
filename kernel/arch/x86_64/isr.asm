@@ -174,3 +174,52 @@ IRQ 12, 44 ; PS2 Mouse
 IRQ 13, 45 ; FPU
 IRQ 14, 46 ; Primary ATA
 IRQ 15, 47 ; Secondary ATA
+
+; Syscall handler (int 0x80)
+global syscall_handler
+extern syscall_dispatcher
+
+syscall_handler:
+    ; Swap GS (for kernel GS base)
+    swapgs
+    
+    ; Save user registers
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    
+    ; Call C dispatcher
+    ; Arguments: syscall number in rax, args in rdi, rsi, rdx, r10, r8, r9
+    mov rdi, rax  ; syscall number
+    mov rsi, rbx  ; arg1
+    mov rdx, rcx  ; arg2
+    mov rcx, rdx  ; arg3
+    ; r10, r8, r9 would be args 4,5,6 if needed
+    call syscall_dispatcher
+    
+    ; Restore registers
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    
+    ; Swap GS back
+    swapgs
+    
+    ; Return to user mode
+    iretq

@@ -58,6 +58,9 @@ extern void irq13(void);
 extern void irq14(void);
 extern void irq15(void);
 
+// Syscall handler
+extern void syscall_handler(void);
+
 // Default handler
 extern void isr_default(void);
 
@@ -132,6 +135,10 @@ void idt_init(void) {
     idt_set_gate(45, (uint64_t)irq13, 0x08, 0x8E);
     idt_set_gate(46, (uint64_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint64_t)irq15, 0x08, 0x8E);
+    
+    // Set syscall gate (int 0x80) - User mode accessible (flags 0xEE)
+    // 0xEE = Present, Ring 3, 64-bit interrupt gate
+    idt_set_gate(0x80, (uint64_t)syscall_handler, 0x08, 0xEE);
     
     // Load IDT
     __asm__ volatile ("lidt %0" : : "m"(idtp));

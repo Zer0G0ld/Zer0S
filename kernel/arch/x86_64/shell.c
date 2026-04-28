@@ -1,17 +1,7 @@
-#include "shell.h"
-#include "memory.h"  // Adicionar este include!
-
-// External VGA functions
-extern void terminal_writestring(const char* str);
-extern void terminal_writechar(char c);
-extern void terminal_clear(void);
-extern void print_hex(unsigned long long value);
-
-// External memory functions
-extern void memory_status(void);
-extern void heap_status(void);
-extern void* kmalloc(size_t size);
-extern void kfree(void* ptr);
+#include <kernel.h>
+#include <shell.h>
+#include <memory.h>
+#include <process.h>
 
 // Simple string compare
 static int string_compare(const char* s1, const char* s2) {
@@ -27,6 +17,7 @@ static void cmd_help(void) {
     terminal_writestring("\nAvailable commands:\n");
     terminal_writestring("  help      - Show this help\n");
     terminal_writestring("  clear     - Clear screen\n");
+    terminal_writestring("  procs     - List processes\n");
     terminal_writestring("  info      - Show system info\n");
     terminal_writestring("  echo      - Print text\n");
     terminal_writestring("  reboot    - Reboot system\n");
@@ -84,7 +75,6 @@ static void cmd_about(void) {
     terminal_writestring("  - PS/2 Keyboard driver\n");
     terminal_writestring("  - VGA Text Mode\n");
     terminal_writestring("  - Interactive Shell\n");
-    terminal_writestring("  - Memory Management\n");
     terminal_writestring("========================\n");
 }
 
@@ -101,7 +91,6 @@ static void cmd_reboot(void) {
 }
 
 static void cmd_kmalloc(char* args) {
-    // Parse size from args
     size_t size = 0;
     for (int i = 0; args[i] >= '0' && args[i] <= '9'; i++) {
         size = size * 10 + (args[i] - '0');
@@ -118,11 +107,9 @@ static void cmd_kmalloc(char* args) {
     }
 }
 
-// Parse and execute command
 void shell_handle_command(char* input) {
     if (input[0] == '\0') return;
     
-    // Parse command
     char cmd[32];
     char args[224];
     int i = 0;
@@ -140,12 +127,14 @@ void shell_handle_command(char* input) {
     }
     args[j] = '\0';
     
-    // Execute command
     if (string_compare(cmd, "help") == 0) {
         cmd_help();
     }
     else if (string_compare(cmd, "mem") == 0) {
         memory_status();
+    }
+    else if (string_compare(cmd, "procs") == 0) {
+        process_list();
     }
     else if (string_compare(cmd, "heap") == 0) {
         heap_status();
@@ -183,7 +172,6 @@ void shell_handle_command(char* input) {
     terminal_writestring("\nZer0S> ");
 }
 
-// Initialize shell
 void shell_init(void) {
     terminal_writestring("\n========================================\n");
     terminal_writestring("  Zer0S Shell v1.0\n");
